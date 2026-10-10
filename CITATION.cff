@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "OES-32 Real-Time Telemetry & Spectral Dashboard"
+type: software
+authors:
+  - family-names: "Brisson"
+    given-names: "Jean-François"
+    affiliation: "Spark AI NLP"
+repository-code: "https://github.com/sparkainlp-x/oes32-dashboard"
+url: "https://sparkainlpx.xyz"
+license: AGPL-3.0-only
+version: "0.1.0"
+date-released: "2026-10-10"
+abstract: >-
+  Desktop PyQt6 + PyQtGraph application showing a live filtered Channel 0
+  waveform and Welch PSD (0-50 Hz) from a simulated 32-channel OES-32 SciPy
+  pipeline (50 Hz notch + 0.5-45 Hz bandpass). Research prototype; synthetic
+  stimuli only.
+keywords:
+  - oes32
+  - telemetry
+  - pyqt6
+  - pyqtgraph
+  - scipy
+  - research-prototype
