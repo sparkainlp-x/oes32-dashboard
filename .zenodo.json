@@ -1,0 +1,38 @@
+{
+  "upload_type": "software",
+  "title": "OES-32 Dashboard: PyQt6 desktop view of a filtered synthetic 32-channel signal and its Welch PSD",
+  "version": "0.1.0",
+  "description": "<p>OES-32 Dashboard is a self-contained PyQt6 + PyQtGraph desktop application that shows a rolling filtered waveform (channel 0) and a channel-averaged Welch power spectral density (0-50 Hz) for a simulated 32-channel signal.</p><p>The GUI-free signal path (oes32_pipeline.py) applies a stateful 50 Hz IIR notch (Q = 30) and a 4th-order 0.5-45 Hz Butterworth bandpass at a nominal 250 Hz. The synthetic input is a 10 Hz test tone plus a 50 Hz mains-like tone in arbitrary units.</p><p>Scope: synthetic stimuli only. It is not hardware, field, medical or certified control software, makes no physical, biological or clinical claim, and is not the normative OES-32 residual (see oes32-residual).</p><p>Python 3.10+, PyQt6, PyQtGraph, NumPy and SciPy. pytest tests of the signal path and a headless start-up smoke test run in GitHub Actions. License: AGPL-3.0-only (commercial licence available).</p>",
+  "creators": [
+    {
+      "name": "Brisson, Jean-François",
+      "affiliation": "Spark AI NLP, Fredericton, New Brunswick, Canada",
+      "orcid": "0009-0000-9778-5374"
+    }
+  ],
+  "access_right": "open",
+  "license": "AGPL-3.0-only",
+  "language": "eng",
+  "keywords": [
+    "research software",
+    "signal processing",
+    "Welch PSD",
+    "PyQt6",
+    "visualization",
+    "synthetic data",
+    "Python",
+    "New Brunswick"
+  ],
+  "communities": [
+    {
+      "identifier": "spark-ai-nlp"
+    }
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/sparkainlp-x/oes32-dashboard",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}

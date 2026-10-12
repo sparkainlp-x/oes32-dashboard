@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # Copyright (C) 2026 Jean-François Brisson, Spark AI NLP
 
-import math
 import sys
 import numpy as np
 from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import QApplication, QLabel, QMainWindow, QVBoxLayout, QWidget
 import pyqtgraph as pg
-import scipy.signal as signal
+
+from oes32_pipeline import OES32FilterPipeline, mean_welch_psd, synthetic_sample
 
 # Configure PyQtGraph global aesthetics for dark-mode telemetry style
 pg.setConfigOptions(antialias=True, background="k", foreground="w")
@@ -20,27 +20,13 @@ class OES32Dashboard(QMainWindow):
     self.setWindowTitle("OES-32 Real-Time Telemetry & Spectral Dashboard")
     self.resize(1200, 800)
 
-    # Simulation & DSP Parameters
-    self.fs = 250.0  # 250 Hz sampling rate
+    # Simulation & DSP parameters (synthetic input only)
+    self.fs = 250.0  # nominal 250 Hz sample rate
     self.num_channels = 32
-    self.window_size = 512  # Rolling buffer size for time/frequency plots
+    self.window_size = 512  # rolling buffer for time/frequency plots
     self.time_buffer = np.zeros((self.window_size, self.num_channels))
     self.t_counter = 0.0
-
-    # 1. 50 Hz Notch Filter Setup
-    b_notch, a_notch = signal.iirnotch(50.0, 30.0, fs=self.fs)
-    self.sos_notch = signal.tf2sos(b_notch, a_notch)
-    zi_notch = signal.sosfilt_zi(self.sos_notch)
-    self.zi_notch = np.repeat(
-        zi_notch[:, :, np.newaxis], self.num_channels, axis=2
-    )
-
-    # 2. Bandpass Filter Setup (0.5Hz - 45Hz Butterworth)
-    self.sos_bp = signal.butter(
-        4, [0.5, 45.0], btype="bandpass", fs=self.fs, output="sos"
-    )
-    zi_bp = signal.sosfilt_zi(self.sos_bp)
-    self.zi_bp = np.repeat(zi_bp[:, :, np.newaxis], self.num_channels, axis=2)
+    self.pipeline = OES32FilterPipeline(self.num_channels, self.fs)
 
     self.init_ui()
 
@@ -56,7 +42,7 @@ class OES32Dashboard(QMainWindow):
 
     # Dashboard Title Header
     title_label = QLabel(
-        "OES-32 Bio-Telemetry Suite — Live Waveform & Welch PSD Spectrum"
+        "OES-32 Dashboard (SYNTHETIC signals) — Live Waveform & Welch PSD"
     )
     title_label.setStyleSheet(
         "font-size: 16px; font-weight: bold; color: #00ffcc; margin-bottom: 5px;"
@@ -71,7 +57,7 @@ class OES32Dashboard(QMainWindow):
     self.plot_time = self.graphics_layout.addPlot(
         row=0, col=0, title="Time Domain Waveform (Channel 0 - Filtered)"
     )
-    self.plot_time.setLabel("left", "Amplitude", units="uV")
+    self.plot_time.setLabel("left", "Amplitude", units="a.u.")
     self.plot_time.setLabel("bottom", "Buffer Samples")
     self.plot_time.showGrid(x=True, y=True, alpha=0.3)
     self.curve_time = self.plot_time.plot(pen=pg.mkPen("#00ffcc", width=2))
@@ -82,7 +68,7 @@ class OES32Dashboard(QMainWindow):
     self.plot_psd = self.graphics_layout.addPlot(
         row=1, col=0, title="Power Spectral Density (Welch Periodogram)"
     )
-    self.plot_psd.setLabel("left", "PSD", units="uV^2/Hz")
+    self.plot_psd.setLabel("left", "PSD", units="a.u.^2/Hz")
     self.plot_psd.setLabel("bottom", "Frequency", units="Hz")
     self.plot_psd.setXRange(0, 50, padding=0)
     self.plot_psd.showGrid(x=True, y=True, alpha=0.3)
@@ -95,22 +81,10 @@ class OES32Dashboard(QMainWindow):
       self.t_counter += 1.0 / self.fs
       t = self.t_counter
 
-      # Simulate 32-channel incoming frame (10Hz Alpha rhythm + 50Hz power line noise)
-      raw_sample = []
-      for ch in range(self.num_channels):
-        alpha_wave = math.sin(2 * math.pi * 10.0 * t + (ch * 0.1)) * 25.0
-        power_noise = math.sin(2 * math.pi * 50.0 * t) * 15.0
-        raw_sample.append(alpha_wave + power_noise)
-
-      # Pipeline: Raw -> 50Hz Notch -> Bandpass Filter
-      x = np.array(raw_sample, dtype=np.float64)[np.newaxis, :]
-      y_notch, self.zi_notch = signal.sosfilt(
-          self.sos_notch, x, axis=0, zi=self.zi_notch
+      # Synthetic 32-channel frame: 10 Hz test tone + 50 Hz mains-like tone
+      filtered_sample = self.pipeline.process(
+          synthetic_sample(t, self.num_channels)
       )
-      y_bp, self.zi_bp = signal.sosfilt(
-          self.sos_bp, y_notch, axis=0, zi=self.zi_bp
-      )
-      filtered_sample = y_bp.squeeze()
 
       # Push sample into rolling time buffer
       self.time_buffer = np.roll(self.time_buffer, -1, axis=0)
@@ -120,8 +94,7 @@ class OES32Dashboard(QMainWindow):
     self.curve_time.setData(self.time_buffer[:, 0])
 
     # Compute Welch PSD across the rolling buffer (averaged across channels)
-    freqs, psd = signal.welch(self.time_buffer, fs=self.fs, nperseg=256, axis=0)
-    mean_psd = np.mean(psd, axis=1)
+    freqs, mean_psd = mean_welch_psd(self.time_buffer, fs=self.fs)
 
     # Update Frequency-Domain Plot
     self.curve_psd.setData(freqs, mean_psd)
