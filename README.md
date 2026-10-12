@@ -59,10 +59,6 @@ This software is available under the GNU Affero General Public License v3.0 only
 
 Organizations that want to use it in proprietary products or services without AGPL obligations can contact the author about a commercial license via https://sparkainlpx.xyz.
 
-## Citation
-
-Citation metadata is in [CITATION.cff](CITATION.cff).
-
 ## Cite
 
 Concept DOI (all versions): [10.5281/zenodo.23307955](https://doi.org/10.5281/zenodo.23307955). v0.1.0: [10.5281/zenodo.23307956](https://doi.org/10.5281/zenodo.23307956). See [CITATION.cff](CITATION.cff).
