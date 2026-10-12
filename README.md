@@ -1,5 +1,6 @@
 # OES-32 Real-Time Telemetry & Spectral Dashboard
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23307955.svg)](https://doi.org/10.5281/zenodo.23307955)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![CI](https://github.com/sparkainlp-x/oes32-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/sparkainlp-x/oes32-dashboard/actions/workflows/ci.yml)
 [![Status: research prototype](https://img.shields.io/badge/status-research%20prototype-orange.svg)](#what-it-is-not)
@@ -61,3 +62,7 @@ Organizations that want to use it in proprietary products or services without AG
 ## Citation
 
 Citation metadata is in [CITATION.cff](CITATION.cff).
+
+## Cite
+
+Concept DOI (all versions): [10.5281/zenodo.23307955](https://doi.org/10.5281/zenodo.23307955). v0.1.0: [10.5281/zenodo.23307956](https://doi.org/10.5281/zenodo.23307956). See [CITATION.cff](CITATION.cff).
